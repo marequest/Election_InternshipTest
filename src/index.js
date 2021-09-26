@@ -1,12 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import 'bootstrap/dist/css/bootstrap.css'
+import './index.css';
 import App from './components/App';
-import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import Header from './components/Header'
+import RegistrationPage from './components/RegistrationPage';
+import VotingPage from './components/VotingPage';
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+const Routing = () => {
+    return(
+        <Router>
+            <Header/>
+            <Switch>
+                <Route exact path="/" component={App} />
+                <Route path="/register" component={RegistrationPage} />
+                <Route path="/vote" component={VotingPage} />
+            </Switch>
+        </Router>
+    )
+}
+
+ReactDOM.render(<Routing />, document.getElementById('root'));
+

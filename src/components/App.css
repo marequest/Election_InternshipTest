@@ -7,3 +7,5 @@
     display: inline-block;
     background-color: #000000;
 }
+
+.hidden { display:none; }

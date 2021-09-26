@@ -1,126 +1,65 @@
-import React, { Component } from 'react';
-//import logo from '../logo.png';
-import './App.css';
-import Web3 from 'web3';
-import Color from '../abis/Color.json'
+import React, { Component } from "react";
+import WakandaContract from "../abis/WakandaContract.json";
+
+import "./App.css";
+import Web3 from "web3";
 
 class App extends Component {
+  state = {web3: null, accounts: null, account: null, contract: null };
 
   async componentWillMount() {
-    await this.loadWeb3()
-    await this.loadBlockchainData()
+    await this.loadWeb3();
+    await this.loadBlockchainData();
   }
 
-  async loadWeb3() {
-    if (window.ethereum) {
+  async loadWeb3(){
+    if(window.ethereum){
       window.web3 = new Web3(window.ethereum)
       await window.ethereum.enable()
-    }
-    else if (window.web3) {
+    }else if(window.web3){
       window.web3 = new Web3(window.web3.currentProvider)
-    }
-    else {
+    }else{
       window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
     }
   }
 
   async loadBlockchainData() {
     const web3 = window.web3
+    this.setState({web3: web3})
     // Load account
-    const accounts = await web3.eth.getAccounts()
-    this.setState({account: accounts[0]})
+    const accountWeb3 = await web3.eth.getAccounts()
+    this.setState({account: accountWeb3[0]})
+
+    const addressField = document.getElementById("address")
+    addressField.innerHTML = " " + accountWeb3[0]
+    web3.eth.getBalance(this.state.account, function(err, result) {
+      if (err) {
+        console.log(err)
+      } else {
+        const val = document.getElementById("value")
+        var res = web3.utils.fromWei(result, "ether")
+        val.innerHTML = parseFloat(res).toFixed(2) + " ETH"
+      }
+    })
 
     const networkId = await web3.eth.net.getId()
-    const networkData = Color.networks[networkId]
+    const networkData = await WakandaContract.networks[networkId]
     if(networkData) {
-      const abi = Color.abi
+      const abi = WakandaContract.abi
       const address = networkData.address
-      const contract = new web3.eth.Contract(abi, address)
-      this.setState({ contract: contract})
-      //console.log(contract);
-      //const totalSupply = await contract.methods.totalSupply().call()
-      //this.setState({totalSupply})
-      //Load Colors
-      for(var i = 1; i <= 5; i++){
-        const color = await contract.methods.colors(i - 1).call()
-        this.setState({
-          colors: [...this.state.colors, color]
-        })
-        //console.log(this.state.colors)
-      }
+      const contractWeb3 = new web3.eth.Contract(abi, address)
+
+      this.setState({contract: contractWeb3})
+
     } else {
       window.alert('Smart contract not deployed to detected network')
-    }
-
-  }
-
-  mint = (color) => {
-    this.state.contract.methods.mint(color).send({from: this.state.account})
-        .once('receipt', (receipt) => {
-          this.setState({
-            colors: [...this.state.colors, color]
-          })
-        })
-  }
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      account: '',
-      contract: null,
-      totalSupply: 0,
-      colors: []
     }
   }
 
   render() {
     return (
-      <div>
-        <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-          <a
-            className="navbar-brand col-sm-3 col-md-2 mr-0"
-            href="http://www.dappuniversity.com/bootcamp"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Color Tokens
-          </a>
-          <ul className="navbar-nav px-3">
-            <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
-              <small className="text-white"><span id="account">{this.state.account}</span></small>
-            </li>
-          </ul>
-        </nav>
-        <div className="container-fluid mt-5">
-          <div className="row">
-            <main role="main" className="col-lg-12 d-flex text-center">
-              <div className="content mr-auto ml-auto">
-                <h1>Issue Token</h1>
-                <form onSubmit={(event) => {
-                  event.preventDefault()
-                  const color = this.color.value
-                  this.mint(color)
-                }}>
-                  <input type='text' className='form-control mb-1'
-                         placeholder='e.g. #FFFFFF' ref={(input) => {this.color = input}}/>
-                  <input type='submit' className='btn btn-block btn-primary'
-                         value='MINT'/>
-                </form>
-              </div>
-            </main>
-          </div>
-          <hr/>
-          <div className="row text-center">
-            { this.state.colors.map((color, key) => {
-              return(
-                  <div key={key} className="col-md-3 mb-3">
-                    <div className="token" style={{ backgroundColor: color }}/>
-                    <div>{color}</div>
-                  </div>
-              )
-            })}
-          </div>
-        </div>
+      <div className="App">
+        <h1>ELECTION</h1>
       </div>
     );
   }

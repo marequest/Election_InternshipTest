@@ -7,6 +7,7 @@ To run the application follow the instructions below:
 npm install
 npm run start
 ```
+In other terminal:
 ```
 cd ./server/
 npm install

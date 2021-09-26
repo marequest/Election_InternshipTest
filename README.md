@@ -13,3 +13,7 @@ cd ./server/
 npm install
 npm run start
 ```
+To deploy your own contract use:
+```
+truffle migrate --reset --compile-all --network rinkeby
+```
